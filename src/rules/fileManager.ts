@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getDirectoryContents, getFileContents } from "../github/client";
-import { RULE_PATHS } from "../utils/constants";
+import { RULE_IS_DIRECTORY, RULE_PATHS } from "../utils/constants";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { RuleType } from "../utils/types";
@@ -114,7 +114,7 @@ export async function downloadRules(
   
   let destinationPath: string;
   
-  if (ruleInfo.isDirectory) {
+  if (RULE_IS_DIRECTORY[ruleInfo.type]) {
     destinationPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES]);
     await downloadDirectory(owner, repo, ruleInfo.path, destinationPath);
   } else {
@@ -128,6 +128,6 @@ export async function downloadRules(
     await downloadFile(owner, repo, ruleInfo.path, destinationPath);
   }
   
-  logger.success(`Downloaded rules to ${destinationPath}`);
+  logger.info(`Downloaded rules to ${destinationPath}`);
   return destinationPath;
 } 

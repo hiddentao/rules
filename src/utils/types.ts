@@ -2,9 +2,9 @@
  * Enum representing different rule types
  */
 export enum RuleType {
-  CURSOR_RULES = "cursor_rules",
-  CURSOR_RULES_FILE = "cursorrules",
-  WINDSURF_RULES_FILE = "windsurfrules",
+  CURSOR_RULES = "cursor_rules_folder",
+  CURSOR_RULES_FILE = "cursor_rules_file",
+  WINDSURF_RULES_FILE = "windsurf_rules_file",
 }
 
 /**
@@ -13,7 +13,6 @@ export enum RuleType {
 export interface RuleTypeInfo {
   type: RuleType;
   path: string;
-  isDirectory: boolean;
 }
 
 /**

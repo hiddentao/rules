@@ -91,7 +91,7 @@ export async function convertRules(
     };
   }
   
-  logger.info(`Converting rules from ${sourceType} to ${targetType}`);
+  logger.verbose(`Converting rules from ${sourceType} to ${targetType}`);
   
   let outputPath: string;
   
@@ -143,7 +143,7 @@ export async function convertRules(
       );
     }
     
-    logger.success(`Rules converted successfully to ${outputPath}`);
+    logger.info(`Rules converted successfully to ${outputPath}`);
     
     return {
       outputPath,

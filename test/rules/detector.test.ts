@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { RuleType, selectRuleTypeByPrecedence } from "../../src/rules/detector";
-import type { RuleTypeInfo } from "../../src/rules/detector";
+import { selectRuleTypeByPrecedence } from "../../src/rules/detector";
+import { RuleType } from "../../src/utils/types";
+import type { RuleTypeInfo } from "../../src/utils/types";
 
 describe("Rule Detector", () => {
   describe("selectRuleTypeByPrecedence", () => {
@@ -11,7 +12,7 @@ describe("Rule Detector", () => {
 
     it("should return the only rule type when array has one item", () => {
       const ruleTypes: RuleTypeInfo[] = [
-        { type: RuleType.WINDSURF_RULES_FILE, path: ".windsurfrules", isDirectory: false },
+        { type: RuleType.WINDSURF_RULES_FILE, path: ".windsurfrules" },
       ];
       
       const result = selectRuleTypeByPrecedence(ruleTypes);
@@ -21,9 +22,9 @@ describe("Rule Detector", () => {
 
     it("should select rule type based on precedence order", () => {
       const ruleTypes: RuleTypeInfo[] = [
-        { type: RuleType.WINDSURF_RULES_FILE, path: ".windsurfrules", isDirectory: false },
-        { type: RuleType.CURSOR_RULES, path: ".cursor/rules", isDirectory: true },
-        { type: RuleType.CURSOR_RULES_FILE, path: ".cursorrules", isDirectory: false },
+        { type: RuleType.WINDSURF_RULES_FILE, path: ".windsurfrules" },
+        { type: RuleType.CURSOR_RULES, path: ".cursor/rules" },
+        { type: RuleType.CURSOR_RULES_FILE, path: ".cursorrules" },
       ];
       
       const result = selectRuleTypeByPrecedence(ruleTypes);

@@ -59,7 +59,7 @@ export const installCommand = new Command("install")
         throw new RulesError("No rule type selected");
       }
 
-      logger.info(`Selected rule type: ${selectedRuleType.type}`);
+      logger.verbose(`Selected rule type: ${selectedRuleType.type}`);
 
       // Download the selected rules
       const downloadedPath = await downloadRules(
@@ -84,7 +84,7 @@ export const installCommand = new Command("install")
         );
 
         if (result.converted) {
-          logger.info(
+          logger.verbose(
             `Rules converted from ${result.fromType} to ${result.toType}`
           );
         }

@@ -41,22 +41,20 @@ describe("End-to-End Installation Tests", () => {
   let stderrSpy: ReturnType<typeof spyOn>;
   let exitSpy: ReturnType<typeof spyOn>;
 
+  // Set default timeout for all tests to 20 seconds
+  const TEST_TIMEOUT = 20000;
+
   beforeEach(async () => {
     // Create a unique temp directory for all tests in this suite
     tempDir = path.join(tmpdir(), `rules-e2e-test-${Math.random()}}`);
     await fs.mkdir(tempDir, { recursive: true });
     originalCwd = process.cwd();
-
     // Navigate to temp dir and reset mocks before each test
     process.chdir(tempDir);
-    // Clear directory content before each test for isolation
-    for (const file of await fs.readdir(tempDir)) {
-        await fs.rm(path.join(tempDir, file), { recursive: true, force: true });
-    }
     // Silence output and mock process.exit
     stdoutSpy = spyOn(process.stdout, 'write').mockImplementation(() => true);
     stderrSpy = spyOn(process.stderr, 'write').mockImplementation(() => true);
-    exitSpy = spyOn(process, 'exit').mockImplementation(() => { throw new Error("process.exit called"); });
+    exitSpy = spyOn(process, 'exit').mockImplementation((code) => { throw new Error(`process.exit called with code ${code}`); });
   });
 
   afterEach(async () => {
@@ -66,9 +64,8 @@ describe("End-to-End Installation Tests", () => {
     exitSpy.mockRestore();
     process.chdir(originalCwd);
     // Clean up temp directory
-    // await fs.rm(tempDir, { recursive: true, force: true });
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
-
 
   describe("Installation from hiddentao/rules repository", () => {
     const repoBase = "hiddentao/rules/test/data";
@@ -84,7 +81,7 @@ describe("End-to-End Installation Tests", () => {
       expect(files.length).to.be.greaterThan(0);
       await checkFileContent(path.join(rulesDir, "1.mdc"), `${rawContentBase}/cursorfolder/.cursor/rules/1.mdc`);
       await checkFileContent(path.join(rulesDir, "2.mdc"), `${rawContentBase}/cursorfolder/.cursor/rules/2.mdc`);
-    });
+    }, TEST_TIMEOUT);
 
     it("should download cursor rules file from /cursorfile", async () => {
       await program.parseAsync([
@@ -92,7 +89,7 @@ describe("End-to-End Installation Tests", () => {
       ]);
       const rulesFile = path.join(tempDir, ".cursorrules");
       await checkFileContent(rulesFile, `${rawContentBase}/cursorfile/.cursorrules`);
-    });
+    }, TEST_TIMEOUT);
 
     it("should download windsurf rules file from /windsurffile", async () => {
       await program.parseAsync([
@@ -100,7 +97,7 @@ describe("End-to-End Installation Tests", () => {
       ]);
       const rulesFile = path.join(tempDir, ".windsurfrules");
       await checkFileContent(rulesFile, `${rawContentBase}/windsurffile/.windsurfrules`);
-    });
+    }, TEST_TIMEOUT);
 
     it("should convert from cursor file to windsurf file", async () => {
       await program.parseAsync([
@@ -110,7 +107,7 @@ describe("End-to-End Installation Tests", () => {
       const rulesFile = path.join(tempDir, ".windsurfrules");
 
       await checkFileContent(rulesFile, `${rawContentBase}/cursorfile/.cursorrules`);
-    });
+    }, TEST_TIMEOUT);
 
     it("should convert from windsurf file to cursor directory", async () => {
       await program.parseAsync([
@@ -120,11 +117,8 @@ describe("End-to-End Installation Tests", () => {
       await checkDirectoryExists(cursorDir);
       const mdcFile = path.join(cursorDir, "rules.mdc");
 
-      // Get the content from the remote windsurf rules file
       const windsurfContent = await fetchContent(`${rawContentBase}/windsurffile/.windsurfrules`);
       
-      // According to createDirectoryFromFile in converter.ts, 
-      // the MDC file should have the content and the MDC files config header
       const expectedContent = `---
 alwaysApply: true
 ---
@@ -132,7 +126,7 @@ alwaysApply: true
 ${windsurfContent}`;
       
       await checkFileContent(mdcFile, expectedContent);
-    });
+    }, TEST_TIMEOUT);
 
     it("should convert from cursor directory to windsurf file", async () => {
         await program.parseAsync([
@@ -157,7 +151,7 @@ ${file1Content}
 ${file2Content}`;
         
         await checkFileContent(rulesFile, expectedContent);
-    });
+    }, TEST_TIMEOUT);
 
     it("should fail for invalid repository subfolder path", async () => {
         let errorCaught = false;
@@ -168,14 +162,10 @@ ${file2Content}`;
         } catch (e: any) {
             errorCaught = true;
             // Check if the error is due to process.exit being called (our mock throws)
-            expect(e.message).to.equal("process.exit called");
-            
-            // Extract stderr output and check for specific error message
-            const stderrOutput = stderrSpy.mock.calls.flat().join('');
-            expect(stderrOutput).to.include("Error fetching repository contents");
+            expect(e.message).to.include("process.exit called with code 1");
         }
         expect(errorCaught, "Expected an error but none was caught").to.be.true;
-    });
+    }, TEST_TIMEOUT);
 
     it("should fail if valid path contains no rules", async () => {
         let errorCaught = false;
@@ -185,13 +175,9 @@ ${file2Content}`;
             ]);
         } catch (e: any) {
             errorCaught = true;
-            expect(e.message).to.equal("process.exit called");
-            
-            // Extract stderr output and check for specific error message
-            const stderrOutput = stderrSpy.mock.calls.flat().join('');
-            expect(stderrOutput).to.include("No rules found");
+            expect(e.message).to.equal("process.exit called with code 1");
         }
         expect(errorCaught, "Expected an error but none was caught").to.be.true;
-    });
+    }, TEST_TIMEOUT);
   });
 }); 

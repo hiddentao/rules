@@ -10,6 +10,15 @@ export const RULE_PATHS: Record<RuleType, string> = {
 };
 
 /**
+ * Indicates whether a rule type is a directory or file
+ */
+export const RULE_IS_DIRECTORY: Record<RuleType, boolean> = {
+  [RuleType.CURSOR_RULES]: true,
+  [RuleType.CURSOR_RULES_FILE]: false,
+  [RuleType.WINDSURF_RULES_FILE]: false,
+};
+
+/**
  * Friendly display names for rule types
  */
 export const RULE_TYPE_DISPLAY_NAMES: Record<RuleType, string> = {

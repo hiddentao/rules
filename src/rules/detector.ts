@@ -1,5 +1,5 @@
 import { pathExists } from "../github/client";
-import { RULE_PATHS } from "../utils/constants";
+import { RULE_IS_DIRECTORY, RULE_PATHS } from "../utils/constants";
 import { logger } from "../utils/logger";
 import { RuleType } from "../utils/types";
 import type { RuleTypeInfo } from "../utils/types";
@@ -32,12 +32,12 @@ export async function detectRuleTypes(
   for (const ruleType of Object.values(RuleType)) {
     const typedRuleType = ruleType as RuleType;
     const rulePath = `${prefix}${RULE_PATHS[typedRuleType]}`;
-    if (await pathExists(owner, repo, rulePath)) {
+    const isDirectory = RULE_IS_DIRECTORY[typedRuleType];
+    if (await pathExists(owner, repo, rulePath, isDirectory)) {
       logger.verbose(`Found ${typedRuleType} at ${rulePath}`);
       ruleTypes.push({
         type: typedRuleType,
         path: rulePath,
-        isDirectory: typedRuleType === RuleType.CURSOR_RULES,
       });
     }
   }
