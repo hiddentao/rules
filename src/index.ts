@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import pc from "picocolors";
 import { version } from "../package.json";
+import installCommand from "./commands/install";
 
 // Create the main program
 const program = new Command();
@@ -12,8 +13,8 @@ program
   .description("Install rules for Cursor/Windsurf/etc")
   .version(version);
 
-// Add commands here as they are implemented
-// e.g., program.addCommand(require('./commands/someCommand').default);
+// Add commands
+program.addCommand(installCommand);
 
 // Error handling for unhandled promises
 process.on("unhandledRejection", (error) => {

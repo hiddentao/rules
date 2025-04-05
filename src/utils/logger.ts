@@ -20,6 +20,12 @@ class Logger {
     }
   }
 
+  verbose(message: string): void {
+    if (this.level <= LogLevel.DEBUG) {
+      console.log(pc.gray(`[verbose] ${message}`));
+    }
+  }
+
   info(message: string): void {
     if (this.level <= LogLevel.INFO) {
       console.log(pc.white(message));

@@ -42,8 +42,13 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
 - **Testing:**
   - Primary focus on end-to-end testing using Mocha to validate complete functionality.
   - Limited unit testing only for format conversion utilities and logging configuration.
-  - Test data in test/data folder containing examples of all rule formats.
-  - End-to-end tests that verify downloading rules from the hiddentao/rules repository.
+  - Test data organized in test/data folder with the following structure:
+    - test/data/all/: Contains all three rule types (.cursor/rules folder, .cursorrules file, .windsurfrules file)
+    - test/data/cursorfolder/: Contains only the .cursor/rules folder
+    - test/data/cursorfile/: Contains only the .cursorrules file
+    - test/data/windsurffile/: Contains only the .windsurfrules file
+  - End-to-end tests use the tmp npm package to create temporary local folders that are automatically cleaned up, ensuring isolated environments for rule installation during testing.
+  - Comprehensive end-to-end tests that verify downloading rules from the hiddentao/rules repository.
 - **Code Quality:**
   - Consistent code style and formatting using Biome.
   - Commit message standardization using conventional commits and Husky.
@@ -203,4 +208,4 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
    - Conduct final end-to-end testing with real-world scenarios.
    - Perform comprehensive end-to-end testing with real-world scenarios.
 
-A detailed breakdown of implementation phases is available in the [phases.md](phases.md) document.
+A detailed breakdown of implementation phases is available in the [phases.md](phases.md) document. 

@@ -1,6 +1,6 @@
 # Implementation Phases for "rules" CLI Tool
 
-## Phase 1: Project Setup and Core Framework
+## Phase 1: Project Setup and Core Framework ✅ COMPLETED
 
 ### Tasks
 - Set up project structure (src/, bin/, dist/, test/)
@@ -28,7 +28,7 @@
 - End-to-end test structure using Mocha
 - Testing framework setup with test data examples
 
-## Phase 2: GitHub Client and Rule Type Detection
+## Phase 2: GitHub Client and Rule Type Detection ✅ COMPLETED
 
 ### Tasks
 - Implement GitHub API client using native fetch
@@ -125,9 +125,13 @@
 
 ## Test Data Structure
 
-The test/data folder will contain:
-- Example .cursor/rules folder
-- Example .cursorrules file
-- Example .windsurfrules file
+The test/data folder contains sample rule files organized in the following structure to facilitate comprehensive testing:
 
-These examples will be used in tests and will also be available in the hiddentao/rules repository for end-to-end testing. 
+- **test/data/all/**: Contains all three rule types (.cursor/rules folder, .cursorrules file, .windsurfrules file)
+- **test/data/cursorfolder/**: Contains only the .cursor/rules folder
+- **test/data/cursorfile/**: Contains only the .cursorrules file
+- **test/data/windsurffile/**: Contains only the .windsurfrules file
+
+This structure allows testing each rule type individually as well as testing scenarios where multiple rule types are present. The end-to-end tests use the `tmp` npm package to create temporary local folders that are automatically cleaned up after tests complete. These temporary folders are used to install the downloaded rules during testing, ensuring a clean test environment for each test case.
+
+The test data is also available in the hiddentao/rules repository for comprehensive end-to-end testing across different rule formats and selection logic. 
