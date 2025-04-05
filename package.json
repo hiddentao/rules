@@ -21,11 +21,14 @@
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@types/bun": "latest",
+    "@types/chai": "^5.2.1",
     "@types/inquirer": "^9.0.7",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.5",
+    "chai": "^5.2.0",
     "husky": "^8.0.3",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "commander": "^11.1.0",

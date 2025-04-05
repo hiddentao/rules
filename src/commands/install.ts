@@ -1,6 +1,8 @@
 import { Command } from "commander";
 import { parseRepoPath, validateRepository } from "../github/client";
+import { convertRules, getTargetRuleType } from "../rules/converter";
 import { detectRuleTypes } from "../rules/detector";
+import { downloadRules } from "../rules/fileManager";
 import { selectRuleType } from "../rules/selector";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
@@ -57,11 +59,36 @@ export const installCommand = new Command("install")
 
       logger.info(`Selected rule type: ${selectedRuleType.type}`);
 
-      // TODO: Implement file downloading and conversion in Phase 3
-      logger.success("Rule detection successful!");
-      logger.info(`Path: ${selectedRuleType.path}`);
-      logger.info(`Type: ${selectedRuleType.type}`);
-      logger.info(`Is Directory: ${selectedRuleType.isDirectory}`);
+      // Download the selected rules
+      const downloadedPath = await downloadRules(
+        owner,
+        repo,
+        selectedRuleType
+      );
+
+      // Determine target rule type for conversion (if needed)
+      const targetRuleType = getTargetRuleType(
+        selectedRuleType.type,
+        options.cursor,
+        options.windsurf
+      );
+
+      // Convert rules if needed
+      if (targetRuleType !== selectedRuleType.type) {
+        const result = await convertRules(
+          downloadedPath,
+          selectedRuleType.type,
+          targetRuleType
+        );
+
+        if (result.converted) {
+          logger.info(
+            `Rules converted from ${result.fromType} to ${result.toType}`
+          );
+        }
+      }
+
+      logger.success("Rules installed successfully!");
     } catch (error) {
       if (error instanceof RulesError) {
         logger.error(error.message);

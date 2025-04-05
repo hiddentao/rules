@@ -22,10 +22,15 @@ process.on("unhandledRejection", (error) => {
   process.exit(1);
 });
 
-// Parse command line arguments
-program.parse(process.argv);
+// Only parse args and potentially show help if running as main script
+if (import.meta.main) {
+  // Parse command line arguments
+  program.parse(process.argv);
 
-// Display help if no command is provided
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+  // Display help if no command is provided
+  if (!process.argv.slice(2).length) {
+    program.outputHelp();
+  }
 }
+
+export default program;
