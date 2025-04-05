@@ -13,6 +13,7 @@
 - Create error handling utilities
 - Set up end-to-end testing framework with Bun's test framework
 - Implement CI workflow for testing
+- Centralize type definitions in a dedicated `types.ts` file
 
 ### Milestones
 - Repository initialized with proper structure
@@ -31,32 +32,38 @@
 ## Phase 2: GitHub Client and Rule Type Detection ✅ COMPLETED
 
 ### Tasks
-- Implement GitHub client using both:
+- Implement GitHub client using the following strategies:
   - Direct HTTP requests to raw.githubusercontent.com for file existence checks and content retrieval
-  - GitHub API for directory content listing
+  - Local Git cloning for directory content operations to avoid GitHub API rate limits
+  - Repository caching system that reuses cloned repositories for 60 seconds
+  - The `tmp` package for managing temporary directories with automatic cleanup
 - Add repository and path validation logic
 - Create logic to detect rule types (.cursor/rules folder, .cursorrules, .windsurfrules)
 - Implement rule selection based on precedence rules
 - Build interactive selection with inquirer when multiple rule types exist
 - Add verbose logging for API operations
 - Create centralized constants and type definitions:
-  - `constants.ts` for paths and rule type information
+  - `constants.ts` for paths, rule type information, and configuration values like cache expiration times
   - `types.ts` for shared type definitions
+- Eliminate hardcoded paths and values throughout the codebase
 
 ### Milestones
-- Functional GitHub client with proper error handling
+- Functional GitHub client with proper error handling and repository caching
 - Successful detection of different rule formats
 - Working rule selection logic based on precedence
 - Interactive selection prompt operational
 - Centralized constants and type definitions
+- Efficient repository cloning with temporary directory management
 
 ### Testing Focus
 - End-to-end tests with 20-second timeouts for all tests
 - End-to-end tests for rule type detection with various repository configurations
 - End-to-end tests for precedence logic with multiple rule types
 - End-to-end tests against test/data examples in hiddentao/rules repository
+- End-to-end tests directly execute the bin/rules binary using execa, validating real-world usage
+- Tests verify both exit codes and stderr output to ensure proper error messaging
 
-## Phase 3: File Management and Rule Conversion
+## Phase 3: File Management and Rule Conversion ✅ COMPLETED
 
 ### Tasks
 - Implement file management module
@@ -141,22 +148,3 @@ The test/data folder contains sample rule files organized in the following struc
 This structure allows testing each rule type individually as well as testing scenarios where multiple rule types are present. The end-to-end tests use the `tmp` npm package to create temporary local folders that are automatically cleaned up after tests complete. These temporary folders are used to install the downloaded rules during testing, ensuring a clean test environment for each test case.
 
 The test data is also available in the hiddentao/rules repository for comprehensive end-to-end testing across different rule formats and selection logic. 
-
-## Recent Enhancements
-
-The following recent enhancements have been implemented:
-
-1. **GitHub API Optimization**:
-   - Modified GitHub client to use vanilla HTTP requests for most operations
-   - Only using GitHub API for directory content listing
-   - Using direct requests to raw.githubusercontent.com for file existence checks and content retrieval
-
-2. **Testing Improvements**:
-   - Updated all end-to-end tests to use 20-second timeouts to accommodate longer-running operations
-   - Switched from Mocha to Bun's test framework for all testing
-
-3. **Code Structure Refactoring**:
-   - Created `constants.ts` to centralize all file paths and rule type definitions
-   - Implemented `types.ts` to centralize all type definitions used across the codebase
-   - Updated `detector.ts` to use constants and loop through rule types based on precedence
-   - Eliminated hardcoded paths throughout the codebase 

@@ -4,7 +4,7 @@ import { RULE_PATHS } from "../utils/constants";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
 import { RuleType } from "../utils/types";
-import type { ConversionResult, RuleTypeInfo } from "../utils/types";
+import type { ConversionResult } from "../utils/types";
 
 /**
  * Reads all files from a directory recursively

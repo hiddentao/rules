@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- Use bun instead of NPM. See [bun.mdc](mdc:.cursor/rules/bun.mdc)

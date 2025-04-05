@@ -18,11 +18,13 @@ export const installCommand = new Command("install")
     "<repo-path>",
     "GitHub repository path (user/repo or user/repo/path)"
   )
-  .option("-c, --cursor", "Prefer Cursor rules format")
-  .option("-w, --windsurf", "Prefer Windsurf rules format")
-  .option("-v, --verbose", "Enable verbose logging")
+  .option("-c, --cursor", "Prefer Cursor rules format", false)
+  .option("-w, --windsurf", "Prefer Windsurf rules format", false)
+  .option("-v, --verbose", "Enable verbose logging", false)
   .action(async (repoPathArg: string, options: InstallCommandOptions) => {
     try {
+      logger.verbose(`Install command options: ${JSON.stringify(options)}`);
+
       // Enable verbose logging if requested
       if (options.verbose) {
         logger.setLevel(0); // Set to DEBUG level
@@ -68,12 +70,16 @@ export const installCommand = new Command("install")
         selectedRuleType
       );
 
+      logger.verbose(`Selecting target rule based on options: selectedRuleType=${selectedRuleType.type} cursor=${options.cursor} windsurf=${options.windsurf}`);
+
       // Determine target rule type for conversion (if needed)
       const targetRuleType = getTargetRuleType(
         selectedRuleType.type,
         options.cursor,
         options.windsurf
       );
+
+      logger.verbose(`Target rule type: ${targetRuleType}`);
 
       // Convert rules if needed
       if (targetRuleType !== selectedRuleType.type) {

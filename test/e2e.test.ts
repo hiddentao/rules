@@ -2,8 +2,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, it, spyOn } from 
 import fs from "node:fs/promises";
 import path from "node:path";
 import { expect } from "chai";
+import { execa } from "execa";
 import tmp from "tmp";
-import program from "../src/index";
 
 // Helper function to fetch content from a URL
 async function fetchContent(url: string): Promise<string> {
@@ -34,13 +34,32 @@ async function checkDirectoryExists(dirPath: string) {
   expect(dirExists, `Directory ${dirPath} should exist`).to.be.true;
 }
 
+// Helper function to execute the rules binary
+async function execRules(args: string[]): Promise<{ exitCode: number, stderr: string }> {
+  try {
+    const binPath = path.resolve(__dirname, "../bin/rules");
+    const { stdout, stderr } = await execa(binPath, args);
+    return { 
+      exitCode: 0,
+      stderr
+    };
+  } catch (error: any) {
+    if (error.exitCode !== undefined) {
+      return {
+        exitCode: error.exitCode,
+        stderr: error.stderr || ""
+      };
+    }
+    throw error;
+  }
+}
+
 describe("End-to-End Installation Tests", () => {
   let tempDir: string;
   let tempDirObj: tmp.DirResult;
   let originalCwd: string;
   let stdoutSpy: ReturnType<typeof spyOn>;
   let stderrSpy: ReturnType<typeof spyOn>;
-  let exitSpy: ReturnType<typeof spyOn>;
 
   // Set default timeout for all tests to 20 seconds
   const TEST_TIMEOUT = 20000;
@@ -52,17 +71,15 @@ describe("End-to-End Installation Tests", () => {
     originalCwd = process.cwd();
     // Navigate to temp dir and reset mocks before each test
     process.chdir(tempDir);
-    // Silence output and mock process.exit
+    // Silence output 
     stdoutSpy = spyOn(process.stdout, 'write').mockImplementation(() => true);
     stderrSpy = spyOn(process.stderr, 'write').mockImplementation(() => true);
-    exitSpy = spyOn(process, 'exit').mockImplementation((code) => { throw new Error(`process.exit called with code ${code}`); });
   });
 
   afterEach(async () => {
     // Restore mocks and CWD after each test
     stdoutSpy.mockRestore();
     stderrSpy.mockRestore();
-    exitSpy.mockRestore();
     process.chdir(originalCwd);
     // Clean up temp directory using tmp's built-in cleanup
     tempDirObj.removeCallback();
@@ -73,8 +90,8 @@ describe("End-to-End Installation Tests", () => {
     const rawContentBase = "https://raw.githubusercontent.com/hiddentao/rules/main/test/data";
 
     it("should download cursor rules folder from /cursorfolder", async () => {
-      await program.parseAsync([
-        "node", "rules", "install", `${repoBase}/cursorfolder`, "--cursor"
+      await execRules([
+        "install", `${repoBase}/cursorfolder`, "--cursor"
       ]);
       const rulesDir = path.join(tempDir, ".cursor", "rules");
       await checkDirectoryExists(rulesDir);
@@ -85,24 +102,24 @@ describe("End-to-End Installation Tests", () => {
     }, TEST_TIMEOUT);
 
     it("should download cursor rules file from /cursorfile", async () => {
-      await program.parseAsync([
-        "node", "rules", "install", `${repoBase}/cursorfile` // No flag, should default
+      await execRules([
+        "install", `${repoBase}/cursorfile` // No flag, should default
       ]);
       const rulesFile = path.join(tempDir, ".cursorrules");
       await checkFileContent(rulesFile, `${rawContentBase}/cursorfile/.cursorrules`);
     }, TEST_TIMEOUT);
 
     it("should download windsurf rules file from /windsurffile", async () => {
-      await program.parseAsync([
-        "node", "rules", "install", `${repoBase}/windsurffile`, "--windsurf"
+      await execRules([
+        "install", `${repoBase}/windsurffile`, "--windsurf"
       ]);
       const rulesFile = path.join(tempDir, ".windsurfrules");
       await checkFileContent(rulesFile, `${rawContentBase}/windsurffile/.windsurfrules`);
     }, TEST_TIMEOUT);
 
     it("should convert from cursor file to windsurf file", async () => {
-      await program.parseAsync([
-        "node", "rules", "install", `${repoBase}/cursorfile`, "--windsurf"
+      await execRules([
+        "install", `${repoBase}/cursorfile`, "--windsurf"
       ]);
       
       const rulesFile = path.join(tempDir, ".windsurfrules");
@@ -111,8 +128,8 @@ describe("End-to-End Installation Tests", () => {
     }, TEST_TIMEOUT);
 
     it("should convert from windsurf file to cursor directory", async () => {
-      await program.parseAsync([
-        "node", "rules", "install", `${repoBase}/windsurffile`, "--cursor"
+      await execRules([
+        "install", `${repoBase}/windsurffile`, "--cursor"
       ]);
       const cursorDir = path.join(tempDir, ".cursor", "rules");
       await checkDirectoryExists(cursorDir);
@@ -130,55 +147,44 @@ ${windsurfContent}`;
     }, TEST_TIMEOUT);
 
     it("should convert from cursor directory to windsurf file", async () => {
-        await program.parseAsync([
-            "node", "rules", "install", `${repoBase}/cursorfolder`, "--windsurf"
-        ]);
-        
-        const rulesFile = path.join(tempDir, ".windsurfrules");
-        
-        // Fetch remote file contents
-        const file1Content = await fetchContent(`${rawContentBase}/cursorfolder/.cursor/rules/1.mdc`);
-        const file2Content = await fetchContent(`${rawContentBase}/cursorfolder/.cursor/rules/2.mdc`);
-        
-        // According to converter.ts concatenateDirectoryFiles logic, files are sorted alphabetically
-        // and concatenated with file headers in the format:
-        // # File: {relativePath}\n\n{content}\n
-        const expectedContent = `# File: 1.mdc
+      await execRules([
+        "install", `${repoBase}/cursorfolder`, "--windsurf"
+      ]);
+      
+      const rulesFile = path.join(tempDir, ".windsurfrules");
+      
+      // Fetch remote file contents
+      const file1Content = await fetchContent(`${rawContentBase}/cursorfolder/.cursor/rules/1.mdc`);
+      const file2Content = await fetchContent(`${rawContentBase}/cursorfolder/.cursor/rules/2.mdc`);
+      
+      // According to converter.ts concatenateDirectoryFiles logic, files are sorted alphabetically
+      // and concatenated with file headers in the format:
+      // # File: {relativePath}\n\n{content}\n
+      const expectedContent = `# File: 1.mdc
 
 ${file1Content}
 
 # File: 2.mdc
 
 ${file2Content}`;
-        
-        await checkFileContent(rulesFile, expectedContent);
+      
+      await checkFileContent(rulesFile, expectedContent);
     }, TEST_TIMEOUT);
 
     it("should fail for invalid repository subfolder path", async () => {
-        let errorCaught = false;
-        try {
-            await program.parseAsync([
-                "node", "rules", "install", "hiddentao/rules/test/data/invalidpath"
-            ]);
-        } catch (e: any) {
-            errorCaught = true;
-            // Check if the error is due to process.exit being called (our mock throws)
-            expect(e.message).to.include("process.exit called with code 1");
-        }
-        expect(errorCaught, "Expected an error but none was caught").to.be.true;
+      const { exitCode, stderr } = await execRules([
+        "install", "hiddentao/rules/test/data/invalidpath"
+      ]);
+      expect(exitCode).to.equal(1);
+      expect(stderr).to.include("No rules found");
     }, TEST_TIMEOUT);
 
     it("should fail if valid path contains no rules", async () => {
-        let errorCaught = false;
-        try {
-            await program.parseAsync([
-                "node", "rules", "install", "hiddentao/rules/src" // Valid path, no rules
-            ]);
-        } catch (e: any) {
-            errorCaught = true;
-            expect(e.message).to.equal("process.exit called with code 1");
-        }
-        expect(errorCaught, "Expected an error but none was caught").to.be.true;
+      const { exitCode, stderr } = await execRules([
+        "install", "hiddentao/rules/src" // Valid path, no rules
+      ]);
+      expect(exitCode).to.equal(1);
+      expect(stderr).to.include("No rules found");
     }, TEST_TIMEOUT);
   });
 }); 

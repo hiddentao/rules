@@ -28,11 +28,15 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
 ## Non-Functional Requirements
 - **Performance:**  
   - Efficient GitHub queries and rapid file downloads.
+  - Repository caching system that reuses locally cloned repositories for 60 seconds to reduce network requests.
+  - Optimized directory operations using local Git cloning to minimize network traffic.
 - **Security:**  
   - Operate on public repositories (with potential for future authentication).
   - Validate inputs to prevent directory traversal and related vulnerabilities.
+  - Use local Git cloning and vanilla HTTP requests to avoid GitHub API rate limits and authentication issues.
 - **Scalability & Maintenance:**  
   - Modular design to allow future enhancements (e.g., additional rule formats or authentication support).
+  - Centralized constants for configuration values like cache expiration times.
 - **Usability:**  
   - Clear CLI feedback and error messages.
   - Colour-coded logging output:
@@ -50,11 +54,16 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
     - test/data/windsurffile/: Contains only the .windsurfrules file
   - End-to-end tests use the tmp npm package to create temporary local folders that are automatically cleaned up, ensuring isolated environments for rule installation during testing.
   - Comprehensive end-to-end tests that verify downloading rules from the hiddentao/rules repository.
+  - End-to-end tests directly execute the actual bin/rules binary rather than calling the internal program API, ensuring real-world usage is properly tested.
+  - The execa package is used to execute and capture output from the bin/rules binary in a cross-platform way.
+  - Tests verify both exit codes and stderr output to ensure proper error messaging (e.g., "No rules found" in failure cases).
 - **Code Quality:**
   - Consistent code style and formatting using Biome.
   - Commit message standardization using conventional commits and Husky.
   - Centralized type definitions in a dedicated `types.ts` file.
   - Path constants and rule type definitions stored in a dedicated `constants.ts` file to avoid hardcoding.
+  - Updated detector logic to use constants and loop through rule types based on precedence.
+  - Eliminated hardcoded paths and values throughout the codebase for better maintainability.
 - **Documentation:**
   - Clear README.md with description, installation guide, usage examples, and contributor information.
   - MIT license included in LICENSE.md and package.json.
@@ -73,7 +82,9 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
   - Uses a GitHub Actions workflow with release-please to manage releases and upload assets (NPM package, native binaries, and `dist/rules.js`).
   - Leverages conventional commits for semantic versioning.
 - **Testing:**
-  - Bun's test framework for end-to-end testing.
+  - Bun's test framework for end-to-end testing with 20-second timeouts.
+  - The execa package for cross-platform binary execution in tests.
+  - Tmp package for temporary directory management with automatic cleanup.
   - GitHub Actions for continuous integration testing.
 - **Code Quality:**
   - Biome for linting and formatting.
@@ -104,12 +115,18 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
    - **Purpose:**  
      Query GitHub for rule files/folders.
    - **Implementation:**  
-     - Uses vanilla HTTP requests for most operations, including path existence checks and file content retrieval.
-     - Only uses the GitHub API for directory content listing.
+     - Uses vanilla HTTP requests for file existence checks and content retrieval.
+     - Uses local Git cloning for directory content operations to avoid GitHub API rate limits.
+     - Implements a repository caching system that reuses locally cloned repositories for a configurable time period (default 60 seconds).
+     - Uses the `tmp` package to manage temporary directories with automatic cleanup.
+     - Centralized cache expiration time as a constant in `constants.ts`.
+     - Optimized to minimize network traffic and avoid GitHub API rate limits entirely.
    - **Responsibilities:**  
      - Validate repository and subfolder paths.
      - Check for the existence of `.cursor/rules`, `.cursorrules`, and `.windsurfrules`.
      - Retrieve file contents via direct HTTP requests to raw.githubusercontent.com.
+     - Clone repositories locally for directory operations and manage the cleanup.
+     - Cache and reuse repository clones when possible to improve performance.
 
 4. **File Manager Module:**
    - **Purpose:**  
@@ -151,11 +168,12 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
    - **Purpose:**
      Centralize common constants and type definitions.
    - **Implementation:**
-     - `constants.ts` defines file paths and rule type information.
+     - `constants.ts` defines file paths, rule type information, and configuration values like cache expiration times.
      - `types.ts` contains centralized type definitions used throughout the application.
    - **Responsibilities:**
      - Provide a single source of truth for constants to avoid hardcoding.
      - Define reusable types for consistent type safety across the application.
+     - Centralize configuration values for easy adjustment.
 
 9. **Rule Detector:**
    - **Purpose:**
@@ -172,11 +190,14 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
      Ensure code quality and functionality.
    - **Implementation:**
      - Use Bun's test framework for end-to-end testing with 20-second timeouts.
+     - Use execa package for cross-platform binary execution in tests.
+     - Validate both exit codes and stderr output for proper error checking.
    - **Responsibilities:**
      - Unit tests limited to format conversion utilities and logging configuration.
      - End-to-end tests for complete workflows.
      - Verify rule downloads from the hiddentao/rules repository.
      - Test rule format conversion through end-to-end tests.
+     - Execute the actual bin/rules binary to validate real-world usage.
 
 ## Build & Publishing Process
 
