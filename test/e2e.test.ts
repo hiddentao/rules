@@ -186,5 +186,30 @@ ${file2Content}`;
       expect(exitCode).to.equal(1);
       expect(stderr).to.include("No rules found");
     }, TEST_TIMEOUT);
+
+    describe("Installation from repository with all rule types", () => {
+      const allRepoPath = `${repoBase}/all`;
+      const allRawContentBase = `${rawContentBase}/all`;
+
+      it("should download cursor rules folder when --cursor flag is used", async () => {
+        await execRules([
+          "install", allRepoPath, "--cursor"
+        ]);
+        const rulesDir = path.join(tempDir, ".cursor", "rules");
+        await checkDirectoryExists(rulesDir);
+        const files = await fs.readdir(rulesDir);
+        expect(files.length).to.be.greaterThan(0);
+        await checkFileContent(path.join(rulesDir, "1.mdc"), `${allRawContentBase}/.cursor/rules/1.mdc`);
+        await checkFileContent(path.join(rulesDir, "2.mdc"), `${allRawContentBase}/.cursor/rules/2.mdc`);
+      }, TEST_TIMEOUT);
+
+      it("should download windsurf rules file when --windsurf flag is used", async () => {
+        await execRules([
+          "install", allRepoPath, "--windsurf"
+        ]);
+        const rulesFile = path.join(tempDir, ".windsurfrules");
+        await checkFileContent(rulesFile, `${allRawContentBase}/.windsurfrules`);
+      }, TEST_TIMEOUT);
+    });
   });
 }); 
