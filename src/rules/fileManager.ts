@@ -110,7 +110,7 @@ export async function downloadRules(
   ruleInfo: RuleTypeInfo,
   localDir = "."
 ): Promise<string> {
-  logger.info(`Downloading ${ruleInfo.type} from ${owner}/${repo}`);
+  logger.verbose(`Downloading ${ruleInfo.type} from ${owner}/${repo}`);
   
   let destinationPath: string;
   

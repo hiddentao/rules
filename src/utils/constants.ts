@@ -25,4 +25,14 @@ export const RULE_TYPE_DISPLAY_NAMES: Record<RuleType, string> = {
   [RuleType.CURSOR_RULES]: `Cursor Rules Directory (${RULE_PATHS[RuleType.CURSOR_RULES]})`,
   [RuleType.CURSOR_RULES_FILE]: `Cursor Rules File (${RULE_PATHS[RuleType.CURSOR_RULES_FILE]})`,
   [RuleType.WINDSURF_RULES_FILE]: `Windsurf Rules File (${RULE_PATHS[RuleType.WINDSURF_RULES_FILE]})`,
+};
+
+/**
+ * GitHub client constants
+ */
+export const GITHUB = {
+  /**
+   * Repository cache expiration time (in milliseconds)
+   */
+  REPO_CACHE_EXPIRY_MS: 60 * 1000, // 60 seconds
 }; 

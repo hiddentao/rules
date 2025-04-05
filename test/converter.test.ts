@@ -1,23 +1,24 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, it } from "bun:test";
 import fs from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect } from "chai";
+import tmp from "tmp";
 import { convertRules, getTargetRuleType } from "../src/rules/converter";
 import { RuleType } from "../src/utils/types";
 
 describe("Rule Converter", () => {
   let tempDir: string;
+  let tempDirObj: tmp.DirResult;
 
   beforeEach(async () => {
-    // Create temp directory
-    tempDir = path.join(tmpdir(), `rules-test-${Math.random()}`);
-    await fs.mkdir(tempDir, { recursive: true });
+    // Create temp directory using tmp package
+    tempDirObj = tmp.dirSync({ unsafeCleanup: true, prefix: 'rules-test-' });
+    tempDir = tempDirObj.name;
   });
 
   afterEach(async () => {
-    // Clean up temp directory
-    await fs.rm(tempDir, { recursive: true, force: true });
+    // Clean up temp directory using tmp's built-in cleanup
+    tempDirObj.removeCallback();
   });
 
   describe("getTargetRuleType", () => {

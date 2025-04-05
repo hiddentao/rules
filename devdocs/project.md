@@ -40,7 +40,8 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
     - Red for errors (output to stderr).
     - Lightgrey for verbose debug messages when `--verbose` is enabled.
 - **Testing:**
-  - Primary focus on end-to-end testing using Mocha to validate complete functionality.
+  - Primary focus on end-to-end testing using Bun's test framework to validate complete functionality.
+  - E2E tests are configured with 20-second timeouts to accommodate longer-running operations.
   - Limited unit testing only for format conversion utilities and logging configuration.
   - Test data organized in test/data folder with the following structure:
     - test/data/all/: Contains all three rule types (.cursor/rules folder, .cursorrules file, .windsurfrules file)
@@ -52,6 +53,8 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
 - **Code Quality:**
   - Consistent code style and formatting using Biome.
   - Commit message standardization using conventional commits and Husky.
+  - Centralized type definitions in a dedicated `types.ts` file.
+  - Path constants and rule type definitions stored in a dedicated `constants.ts` file to avoid hardcoding.
 - **Documentation:**
   - Clear README.md with description, installation guide, usage examples, and contributor information.
   - MIT license included in LICENSE.md and package.json.
@@ -70,7 +73,7 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
   - Uses a GitHub Actions workflow with release-please to manage releases and upload assets (NPM package, native binaries, and `dist/rules.js`).
   - Leverages conventional commits for semantic versioning.
 - **Testing:**
-  - Mocha for end-to-end testing.
+  - Bun's test framework for end-to-end testing.
   - GitHub Actions for continuous integration testing.
 - **Code Quality:**
   - Biome for linting and formatting.
@@ -101,10 +104,12 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
    - **Purpose:**  
      Query GitHub for rule files/folders.
    - **Implementation:**  
-     Use Node.js native `fetch` for HTTP requests.
+     - Uses vanilla HTTP requests for most operations, including path existence checks and file content retrieval.
+     - Only uses the GitHub API for directory content listing.
    - **Responsibilities:**  
      - Validate repository and subfolder paths.
      - Check for the existence of `.cursor/rules`, `.cursorrules`, and `.windsurfrules`.
+     - Retrieve file contents via direct HTTP requests to raw.githubusercontent.com.
 
 4. **File Manager Module:**
    - **Purpose:**  
@@ -142,11 +147,31 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
      - Implement try-catch blocks in all asynchronous code.
      - Allow errors to propagate to a top-level handler that logs the error and exits the process abnormally.
 
-8. **Testing Module:**
+8. **Constants and Types:**
+   - **Purpose:**
+     Centralize common constants and type definitions.
+   - **Implementation:**
+     - `constants.ts` defines file paths and rule type information.
+     - `types.ts` contains centralized type definitions used throughout the application.
+   - **Responsibilities:**
+     - Provide a single source of truth for constants to avoid hardcoding.
+     - Define reusable types for consistent type safety across the application.
+
+9. **Rule Detector:**
+   - **Purpose:**
+     Identify and select rule types based on precedence.
+   - **Implementation:**
+     - Uses constants from `constants.ts` to avoid hardcoding.
+     - Provides a selection algorithm that loops through rule types in precedence order.
+   - **Responsibilities:**
+     - Detect available rule types in a repository.
+     - Select the appropriate rule type based on precedence when multiple are available.
+
+10. **Testing Module:**
    - **Purpose:**
      Ensure code quality and functionality.
    - **Implementation:**
-     Use Mocha for end-to-end testing.
+     - Use Bun's test framework for end-to-end testing with 20-second timeouts.
    - **Responsibilities:**
      - Unit tests limited to format conversion utilities and logging configuration.
      - End-to-end tests for complete workflows.
@@ -181,13 +206,13 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
    - Configure Biome for linting and formatting.
    - Set up Husky with conventional commits.
    - Implement the CLI, logging, GitHub client, file management, and conversion modules.
-   - Set up end-to-end testing with Mocha.
+   - Set up end-to-end testing with Bun's test framework.
    - Develop unit tests for format conversion and logging configuration.
    - Prepare test data folder with example rule formats.
 
 2. **Integration & End-to-End Testing:**
    - Integrate all modules and implement comprehensive error handling.
-   - Develop end-to-end tests for complete workflows.
+   - Develop end-to-end tests for complete workflows with 20-second timeouts.
    - Set up CI workflow for automated testing.
    - Test against the hiddentao/rules repository.
 

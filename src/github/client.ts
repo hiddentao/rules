@@ -1,5 +1,18 @@
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import simpleGit from "simple-git";
+import tmp from "tmp";
+import { GITHUB } from "../utils/constants";
 import { RulesError } from "../utils/errors";
 import type { RepoPathInfo } from "../utils/types";
+
+// Repository cache with expiration
+interface RepoCacheEntry {
+  dir: string;
+  timestamp: number;
+}
+
+const repoCache: Map<string, RepoCacheEntry> = new Map();
 
 /**
  * Parse GitHub repository path from command line input
@@ -24,82 +37,56 @@ export function parseRepoPath(repoPath: string): RepoPathInfo {
 }
 
 /**
- * Fetches content from GitHub API with error handling
- * Used only for directory contents
+ * Create a temporary directory that auto-removes on process exit
  */
-async function fetchGitHubAPI(
-  url: string,
-  options: RequestInit = {}
-): Promise<any> {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "rules-cli-tool",
-        ...options.headers,
-      },
-      ...options,
+function createTempDir(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    tmp.dir({ unsafeCleanup: true }, (err, path) => {
+      if (err) reject(err);
+      else resolve(path);
     });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new RulesError(`GitHub resource not found: ${url}`);
-      }
-
-      const errorBody = await response.text();
-      throw new RulesError(
-        `GitHub API error (${response.status}): ${errorBody}`
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    if (error instanceof RulesError) {
-      throw error;
-    }
-    throw new RulesError(
-      `Error fetching from GitHub: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
-  }
+  });
 }
 
 /**
- * Fetches raw content from GitHub with error handling
+ * Get a cached repository or clone a new one
  */
-async function fetchGitHubRaw(
+async function getRepository(owner: string, repo: string): Promise<string> {
+  const cacheKey = `${owner}/${repo}`;
+  const now = Date.now();
+  const cachedRepo = repoCache.get(cacheKey);
+  
+  // Return cached repo if it exists and hasn't expired
+  if (cachedRepo && (now - cachedRepo.timestamp) < GITHUB.REPO_CACHE_EXPIRY_MS) {
+    return cachedRepo.dir;
+  }
+  
+  // Create new temp directory and clone repo
+  const targetDir = await createTempDir();
+  await cloneRepositoryImpl(owner, repo, targetDir);
+  
+  // Cache the newly cloned repo
+  repoCache.set(cacheKey, { dir: targetDir, timestamp: now });
+  
+  return targetDir;
+}
+
+/**
+ * Implementation of repository cloning
+ */
+async function cloneRepositoryImpl(
   owner: string,
   repo: string,
-  path: string,
-  branch = "main"
-): Promise<string> {
-  const url = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+  targetDir: string
+): Promise<void> {
+  const repoUrl = `https://github.com/${owner}/${repo}.git`;
+  const git = simpleGit();
   
   try {
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent": "rules-cli-tool",
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new RulesError(`GitHub resource not found: ${url}`);
-      }
-
-      throw new RulesError(
-        `GitHub error (${response.status}): ${response.statusText}`
-      );
-    }
-
-    return await response.text();
+    await git.clone(repoUrl, targetDir, ["--depth", "1"]);
   } catch (error) {
-    if (error instanceof RulesError) {
-      throw error;
-    }
     throw new RulesError(
-      `Error fetching from GitHub: ${
+      `Failed to clone repository ${owner}/${repo}: ${
         error instanceof Error ? error.message : String(error)
       }`
     );
@@ -107,28 +94,26 @@ async function fetchGitHubRaw(
 }
 
 /**
- * Checks if a path exists in the repository using raw.githubusercontent.com for files
- * and GitHub API for folders
+ * Checks if a path exists in the repository using the local clone
  */
 export async function pathExists(
   owner: string,
   repo: string,
-  path: string,
+  filePath: string,
   isDirectory = false
 ): Promise<boolean> {
   try {
-    if (isDirectory) {
-      // Use GitHub API for directories
-      await fetchGitHubAPI(
-        `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
-      );
-    } else {
-      // Use raw.githubusercontent.com for files
-      await fetchGitHubRaw(owner, repo, path);
+    const repoDir = await getRepository(owner, repo);
+    const fullPath = path.join(repoDir, filePath);
+    const stats = await fs.stat(fullPath).catch(() => null);
+    
+    if (!stats) {
+      return false;
     }
-    return true;
+    
+    return isDirectory ? stats.isDirectory() : stats.isFile();
   } catch (error) {
-    if (error instanceof RulesError && error.message.includes("not found")) {
+    if (error instanceof RulesError && error.message.includes("Failed to clone")) {
       return false;
     }
     throw error;
@@ -136,73 +121,67 @@ export async function pathExists(
 }
 
 /**
- * Gets contents of a file from GitHub using raw.githubusercontent.com
+ * Gets contents of a file from GitHub using local clone
  */
 export async function getFileContents(
   owner: string,
   repo: string,
-  path: string
+  filePath: string
 ): Promise<string> {
-  return await fetchGitHubRaw(owner, repo, path);
+  try {
+    const repoDir = await getRepository(owner, repo);
+    const fullPath = path.join(repoDir, filePath);
+    return await fs.readFile(fullPath, 'utf-8');
+  } catch (error) {
+    throw new RulesError(
+      `Error reading file ${filePath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
 }
 
 /**
- * Gets contents of a directory from GitHub
- * Still uses GitHub API as there's no direct way to get directory listings from raw.githubusercontent.com
+ * Gets contents of a directory from GitHub by using local clone
  */
 export async function getDirectoryContents(
   owner: string,
   repo: string,
-  path: string
+  dirPath: string
 ): Promise<Array<{ name: string; path: string; type: string }>> {
-  const data = await fetchGitHubAPI(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
-  );
-
-  if (!Array.isArray(data)) {
-    throw new RulesError(`Path is not a directory: ${path}`);
+  try {
+    const repoDir = await getRepository(owner, repo);
+    const fullPath = path.join(repoDir, dirPath);
+    const entries = await fs.readdir(fullPath, { withFileTypes: true });
+    
+    return entries.map(entry => ({
+      name: entry.name,
+      path: path.join(dirPath, entry.name),
+      type: entry.isDirectory() ? "dir" : "file"
+    }));
+  } catch (error) {
+    throw new RulesError(
+      `Error reading directory ${dirPath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
-
-  return data.map((item) => ({
-    name: item.name,
-    path: item.path,
-    type: item.type,
-  }));
 }
 
 /**
- * Validates that a repository exists by attempting to access its README file
+ * Validates that a repository exists by attempting to clone it
  */
 export async function validateRepository(
   owner: string,
   repo: string
 ): Promise<boolean> {
   try {
-    // Try to fetch the repository's landing page
-    const response = await fetch(`https://github.com/${owner}/${repo}`, {
-      headers: {
-        "User-Agent": "rules-cli-tool",
-      },
-    });
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new RulesError(`Repository not found: ${owner}/${repo}`);
-      }
-      throw new RulesError(
-        `GitHub error (${response.status}): ${response.statusText}`
-      );
-    }
-    
+    await getRepository(owner, repo);
     return true;
   } catch (error) {
-    if (error instanceof RulesError) {
-      throw error;
+    if (error instanceof RulesError && error.message.includes("Failed to clone")) {
+      throw new RulesError(`Repository not found: ${owner}/${repo}`);
     }
-    throw new RulesError(
-      `Error validating repository: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
+    throw error;
   }
 }

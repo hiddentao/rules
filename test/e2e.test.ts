@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, it, spyOn } from "bun:test";
 import fs from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect } from "chai";
+import tmp from "tmp";
 import program from "../src/index";
 
 // Helper function to fetch content from a URL
@@ -36,6 +36,7 @@ async function checkDirectoryExists(dirPath: string) {
 
 describe("End-to-End Installation Tests", () => {
   let tempDir: string;
+  let tempDirObj: tmp.DirResult;
   let originalCwd: string;
   let stdoutSpy: ReturnType<typeof spyOn>;
   let stderrSpy: ReturnType<typeof spyOn>;
@@ -45,9 +46,9 @@ describe("End-to-End Installation Tests", () => {
   const TEST_TIMEOUT = 20000;
 
   beforeEach(async () => {
-    // Create a unique temp directory for all tests in this suite
-    tempDir = path.join(tmpdir(), `rules-e2e-test-${Math.random()}}`);
-    await fs.mkdir(tempDir, { recursive: true });
+    // Create a unique temp directory for all tests in this suite using tmp package
+    tempDirObj = tmp.dirSync({ unsafeCleanup: true, prefix: 'rules-e2e-test-' });
+    tempDir = tempDirObj.name;
     originalCwd = process.cwd();
     // Navigate to temp dir and reset mocks before each test
     process.chdir(tempDir);
@@ -63,8 +64,8 @@ describe("End-to-End Installation Tests", () => {
     stderrSpy.mockRestore();
     exitSpy.mockRestore();
     process.chdir(originalCwd);
-    // Clean up temp directory
-    await fs.rm(tempDir, { recursive: true, force: true });
+    // Clean up temp directory using tmp's built-in cleanup
+    tempDirObj.removeCallback();
   });
 
   describe("Installation from hiddentao/rules repository", () => {

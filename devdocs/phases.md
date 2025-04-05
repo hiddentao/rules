@@ -11,7 +11,7 @@
 - Implement basic CLI structure using commander.js
 - Implement logging module with color-coded output using picocolors
 - Create error handling utilities
-- Set up end-to-end testing framework with Mocha
+- Set up end-to-end testing framework with Bun's test framework
 - Implement CI workflow for testing
 
 ### Milestones
@@ -25,27 +25,33 @@
 
 ### Testing Focus
 - Unit tests for logging configuration
-- End-to-end test structure using Mocha
+- End-to-end test structure using Bun's test framework
 - Testing framework setup with test data examples
 
 ## Phase 2: GitHub Client and Rule Type Detection ✅ COMPLETED
 
 ### Tasks
-- Implement GitHub API client using native fetch
+- Implement GitHub client using both:
+  - Direct HTTP requests to raw.githubusercontent.com for file existence checks and content retrieval
+  - GitHub API for directory content listing
 - Add repository and path validation logic
 - Create logic to detect rule types (.cursor/rules folder, .cursorrules, .windsurfrules)
 - Implement rule selection based on precedence rules
 - Build interactive selection with inquirer when multiple rule types exist
 - Add verbose logging for API operations
+- Create centralized constants and type definitions:
+  - `constants.ts` for paths and rule type information
+  - `types.ts` for shared type definitions
 
 ### Milestones
-- Functional GitHub API client with proper error handling
+- Functional GitHub client with proper error handling
 - Successful detection of different rule formats
 - Working rule selection logic based on precedence
 - Interactive selection prompt operational
+- Centralized constants and type definitions
 
 ### Testing Focus
-- End-to-end tests with mock GitHub API responses
+- End-to-end tests with 20-second timeouts for all tests
 - End-to-end tests for rule type detection with various repository configurations
 - End-to-end tests for precedence logic with multiple rule types
 - End-to-end tests against test/data examples in hiddentao/rules repository
@@ -135,3 +141,22 @@ The test/data folder contains sample rule files organized in the following struc
 This structure allows testing each rule type individually as well as testing scenarios where multiple rule types are present. The end-to-end tests use the `tmp` npm package to create temporary local folders that are automatically cleaned up after tests complete. These temporary folders are used to install the downloaded rules during testing, ensuring a clean test environment for each test case.
 
 The test data is also available in the hiddentao/rules repository for comprehensive end-to-end testing across different rule formats and selection logic. 
+
+## Recent Enhancements
+
+The following recent enhancements have been implemented:
+
+1. **GitHub API Optimization**:
+   - Modified GitHub client to use vanilla HTTP requests for most operations
+   - Only using GitHub API for directory content listing
+   - Using direct requests to raw.githubusercontent.com for file existence checks and content retrieval
+
+2. **Testing Improvements**:
+   - Updated all end-to-end tests to use 20-second timeouts to accommodate longer-running operations
+   - Switched from Mocha to Bun's test framework for all testing
+
+3. **Code Structure Refactoring**:
+   - Created `constants.ts` to centralize all file paths and rule type definitions
+   - Implemented `types.ts` to centralize all type definitions used across the codebase
+   - Updated `detector.ts` to use constants and loop through rule types based on precedence
+   - Eliminated hardcoded paths throughout the codebase 
