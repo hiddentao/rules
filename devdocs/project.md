@@ -114,7 +114,7 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
      - **From `.cursor/rules` folder to `.cursorrules` or `.windsurfrules`:**  
        Concatenate all files into a single file.
      - **From `.cursorrules` or `.windsurfrules` to `.cursor/rules` folder:**  
-       Create the `.cursor/rules` folder and place the file inside as `rules.mdc`.
+       Create the `.cursor/rules` folder and place the file inside as `rules.mdc` with the MDC files config set to "always attached".
      - **Between `.windsurfrules` and `.cursorrules`:**  
        Simply rename the file.
    - **Responsibilities:**  
@@ -158,7 +158,7 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
   - Use Bun's native executable build process to generate binaries for multiple platforms.
 - **Publishing Workflow:**
   - Create a GitHub Actions workflow to automate publishing.
-  - Use release-please for release management and upload the NPM package and native binaries to the GitHub Releases page.
+  - Use release-please for release management and upload assets (NPM package, native binaries, and `dist/rules.js`).
   - Leverage conventional commits to determine version bumps automatically.
 - **Testing Workflow:**
   - Create a GitHub Actions workflow to run end-to-end tests on push and pull requests.

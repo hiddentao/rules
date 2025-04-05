@@ -16,31 +16,31 @@ class Logger {
 
   debug(message: string): void {
     if (this.level <= LogLevel.DEBUG) {
-      console.log(pc.gray(`[DEBUG] ${message}`));
+      console.log(pc.gray(message));
     }
   }
 
   info(message: string): void {
     if (this.level <= LogLevel.INFO) {
-      console.log(pc.blue(`[INFO] ${message}`));
+      console.log(pc.white(message));
     }
   }
 
   success(message: string): void {
     if (this.level <= LogLevel.INFO) {
-      console.log(pc.green(`[SUCCESS] ${message}`));
+      console.log(pc.green(message));
     }
   }
 
   warn(message: string): void {
     if (this.level <= LogLevel.WARN) {
-      console.log(pc.yellow(`[WARN] ${message}`));
+      console.log(pc.yellow(message));
     }
   }
 
   error(message: string, err?: Error): void {
     if (this.level <= LogLevel.ERROR) {
-      console.error(pc.red(`[ERROR] ${message}`));
+      console.error(pc.red(message));
       if (err && this.level === LogLevel.DEBUG) {
         console.error(pc.red(err.stack || err.toString()));
       }

@@ -9,7 +9,7 @@ const program = new Command();
 
 program
   .name("rules")
-  .description("CLI tool for managing Cursor rules")
+  .description("Install rules for Cursor/Windsurf/etc")
   .version(version);
 
 // Add commands here as they are implemented

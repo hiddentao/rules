@@ -58,6 +58,7 @@
 - Build logic to download and install selected rule type
 - Handle path creation and file system operations
 - Implement format conversion notification system
+- Ensure MDC files config is set to "always attached" when converting to .cursor/rules
 - Add verbose logging for file operations
 
 ### Milestones
@@ -71,6 +72,7 @@
 - End-to-end tests for file download and installation process
 - End-to-end tests for all rule format combinations
 - End-to-end tests validating converted output matches expected format
+- Verification that MDC files config is correctly set to "always attached" during conversions
 
 ## Phase 4: Packaging and Distribution
 
