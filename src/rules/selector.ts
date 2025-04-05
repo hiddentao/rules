@@ -1,24 +1,9 @@
 import inquirer from "inquirer";
+import { RULE_TYPE_DISPLAY_NAMES } from "../utils/constants";
 import { logger } from "../utils/logger";
-import { RuleType, selectRuleTypeByPrecedence } from "./detector";
-import type { RuleTypeInfo } from "./detector";
-
-/**
- * Options for rule selection
- */
-export interface RuleSelectionOptions {
-  preferCursor?: boolean;
-  preferWindsurf?: boolean;
-}
-
-/**
- * Friendly display names for rule types
- */
-const RULE_TYPE_DISPLAY_NAMES = {
-  [RuleType.CURSOR_RULES]: "Cursor Rules Directory (.cursor/rules)",
-  [RuleType.CURSOR_RULES_FILE]: "Cursor Rules File (.cursorrules)",
-  [RuleType.WINDSURF_RULES_FILE]: "Windsurf Rules File (.windsurfrules)",
-};
+import { RuleType } from "../utils/types";
+import type { RuleSelectionOptions, RuleTypeInfo } from "../utils/types";
+import { selectRuleTypeByPrecedence } from "./detector";
 
 /**
  * Select rule type based on options and available rule types
@@ -39,7 +24,7 @@ export async function selectRuleType(
   }
 
   // Check for preferred rule types
-  if (options.preferCursor) {
+  if (options.cursor) {
     const cursorRulesDir = ruleTypes.find(
       (r) => r.type === RuleType.CURSOR_RULES
     );
@@ -60,7 +45,7 @@ export async function selectRuleType(
     return selectRuleTypeByPrecedence(ruleTypes);
   }
 
-  if (options.preferWindsurf) {
+  if (options.windsurf) {
     const windsurfRules = ruleTypes.find(
       (r) => r.type === RuleType.WINDSURF_RULES_FILE
     );

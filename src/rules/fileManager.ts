@@ -1,10 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getDirectoryContents, getFileContents } from "../github/client";
+import { RULE_PATHS } from "../utils/constants";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
-import { RuleType } from "./detector";
-import type { RuleTypeInfo } from "./detector";
+import { RuleType } from "../utils/types";
+import type { RuleTypeInfo } from "../utils/types";
 
 /**
  * Creates a directory recursively if it doesn't exist
@@ -114,14 +115,14 @@ export async function downloadRules(
   let destinationPath: string;
   
   if (ruleInfo.isDirectory) {
-    destinationPath = path.join(localDir, ".cursor", "rules");
+    destinationPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES]);
     await downloadDirectory(owner, repo, ruleInfo.path, destinationPath);
   } else {
     // For single files
     if (ruleInfo.type === RuleType.CURSOR_RULES_FILE) {
-      destinationPath = path.join(localDir, ".cursorrules");
+      destinationPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES_FILE]);
     } else {
-      destinationPath = path.join(localDir, ".windsurfrules");
+      destinationPath = path.join(localDir, RULE_PATHS[RuleType.WINDSURF_RULES_FILE]);
     }
     
     await downloadFile(owner, repo, ruleInfo.path, destinationPath);

@@ -14,7 +14,7 @@ You are a senior programmer and technical architect with 20+ years of developmen
 - Never overwrite my .env* files without first asking me
 - Avoid having files over 300 lines of code - refactor at that point
 - Never add stubbing or fake data patterns - prompt me instead
-- Never hardcode values which have functional meaning. Always store them as constants in one place from where they can be referenced across the codebaae. This includes mathematical values, filepaths, labels, names, etc.
+- Never hardcode literal values which have functional meaning. Always store them as constants in one place from where they can be referenced across the codebase. Thus, any literal string/number value should only appear in one place in the codebase.
 - When writing code, take into account different environments: dev, staging, prod. 
 - Do not use deprecated methods from third-party packages. Look up a package's docs (matching its installed version) to see what methods should be called and how.
 - Do not deprecate old methods in the codebase unless specifically instructed to do so.

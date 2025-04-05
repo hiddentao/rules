@@ -1,13 +1,5 @@
 import { RulesError } from "../utils/errors";
-
-/**
- * Type for repository path parsing results
- */
-export interface RepoPathInfo {
-  owner: string;
-  repo: string;
-  path?: string;
-}
+import type { RepoPathInfo } from "../utils/types";
 
 /**
  * Parse GitHub repository path from command line input

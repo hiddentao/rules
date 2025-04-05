@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect } from "chai";
 import { convertRules, getTargetRuleType } from "../src/rules/converter";
-import { RuleType } from "../src/rules/detector";
+import { RuleType } from "../src/utils/types";
 
 describe("Rule Converter", () => {
   let tempDir: string;
@@ -27,21 +27,21 @@ describe("Rule Converter", () => {
       expect(getTargetRuleType(RuleType.WINDSURF_RULES_FILE)).to.equal(RuleType.WINDSURF_RULES_FILE);
     });
 
-    it("should return CURSOR_RULES when preferCursor is true and source is not CURSOR_RULES", () => {
+    it("should return CURSOR_RULES when cursor is true and source is not CURSOR_RULES", () => {
       expect(getTargetRuleType(RuleType.CURSOR_RULES_FILE, true, false)).to.equal(RuleType.CURSOR_RULES);
       expect(getTargetRuleType(RuleType.WINDSURF_RULES_FILE, true, false)).to.equal(RuleType.CURSOR_RULES);
     });
 
-    it("should not change type when preferCursor is true and source is already CURSOR_RULES", () => {
+    it("should not change type when cursor is true and source is already CURSOR_RULES", () => {
       expect(getTargetRuleType(RuleType.CURSOR_RULES, true, false)).to.equal(RuleType.CURSOR_RULES);
     });
 
-    it("should return WINDSURF_RULES_FILE when preferWindsurf is true and source is not WINDSURF_RULES_FILE", () => {
+    it("should return WINDSURF_RULES_FILE when windsurf is true and source is not WINDSURF_RULES_FILE", () => {
       expect(getTargetRuleType(RuleType.CURSOR_RULES, false, true)).to.equal(RuleType.WINDSURF_RULES_FILE);
       expect(getTargetRuleType(RuleType.CURSOR_RULES_FILE, false, true)).to.equal(RuleType.WINDSURF_RULES_FILE);
     });
 
-    it("should not change type when preferWindsurf is true and source is already WINDSURF_RULES_FILE", () => {
+    it("should not change type when windsurf is true and source is already WINDSURF_RULES_FILE", () => {
       expect(getTargetRuleType(RuleType.WINDSURF_RULES_FILE, false, true)).to.equal(RuleType.WINDSURF_RULES_FILE);
     });
 

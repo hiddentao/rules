@@ -1,19 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { RULE_PATHS } from "../utils/constants";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
-import { RuleType } from "./detector";
-import type { RuleTypeInfo } from "./detector";
-
-/**
- * Conversion result with output path and whether conversion was performed
- */
-export interface ConversionResult {
-  outputPath: string;
-  converted: boolean;
-  fromType: RuleType;
-  toType: RuleType;
-}
+import { RuleType } from "../utils/types";
+import type { ConversionResult, RuleTypeInfo } from "../utils/types";
 
 /**
  * Reads all files from a directory recursively
@@ -114,9 +105,9 @@ export async function convertRules(
       const content = await concatenateDirectoryFiles(sourcePath);
       
       if (targetType === RuleType.CURSOR_RULES_FILE) {
-        outputPath = path.join(localDir, ".cursorrules");
+        outputPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES_FILE]);
       } else {
-        outputPath = path.join(localDir, ".windsurfrules");
+        outputPath = path.join(localDir, RULE_PATHS[RuleType.WINDSURF_RULES_FILE]);
       }
       
       await fs.writeFile(outputPath, content, "utf-8");
@@ -127,7 +118,7 @@ export async function convertRules(
         sourceType === RuleType.WINDSURF_RULES_FILE) &&
       targetType === RuleType.CURSOR_RULES
     ) {
-      outputPath = path.join(localDir, ".cursor", "rules");
+      outputPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES]);
       await createDirectoryFromFile(sourcePath, outputPath);
     }
     // Convert between file types (simple rename)
@@ -140,9 +131,9 @@ export async function convertRules(
       const content = await fs.readFile(sourcePath, "utf-8");
       
       if (targetType === RuleType.CURSOR_RULES_FILE) {
-        outputPath = path.join(localDir, ".cursorrules");
+        outputPath = path.join(localDir, RULE_PATHS[RuleType.CURSOR_RULES_FILE]);
       } else {
-        outputPath = path.join(localDir, ".windsurfrules");
+        outputPath = path.join(localDir, RULE_PATHS[RuleType.WINDSURF_RULES_FILE]);
       }
       
       await fs.writeFile(outputPath, content, "utf-8");
@@ -174,14 +165,14 @@ export async function convertRules(
  */
 export function getTargetRuleType(
   sourceType: RuleType,
-  preferCursor = false,
-  preferWindsurf = false
+  cursor = false,
+  windsurf = false
 ): RuleType {
-  if (preferCursor) {
+  if (cursor) {
     if (sourceType !== RuleType.CURSOR_RULES) {
       return RuleType.CURSOR_RULES;
     }
-  } else if (preferWindsurf) {
+  } else if (windsurf) {
     if (sourceType !== RuleType.WINDSURF_RULES_FILE) {
       return RuleType.WINDSURF_RULES_FILE;
     }

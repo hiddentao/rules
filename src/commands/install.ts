@@ -6,10 +6,9 @@ import { downloadRules } from "../rules/fileManager";
 import { selectRuleType } from "../rules/selector";
 import { RulesError } from "../utils/errors";
 import { logger } from "../utils/logger";
+import type { RuleSelectionOptions } from "../utils/types";
 
-interface InstallCommandOptions {
-  cursor: boolean;
-  windsurf: boolean;
+interface InstallCommandOptions extends RuleSelectionOptions {
   verbose: boolean;
 }
 
@@ -47,11 +46,14 @@ export const installCommand = new Command("install")
         throw new RulesError("No rules found in the specified location");
       }
 
+      // Map commander options to selection options
+      const selectionOptions: RuleSelectionOptions = {
+        cursor: options.cursor,
+        windsurf: options.windsurf,
+      };
+
       // Select rule type based on options or interactive prompt
-      const selectedRuleType = await selectRuleType(ruleTypes, {
-        preferCursor: options.cursor,
-        preferWindsurf: options.windsurf,
-      });
+      const selectedRuleType = await selectRuleType(ruleTypes, selectionOptions);
 
       if (!selectedRuleType) {
         throw new RulesError("No rule type selected");

@@ -1,32 +1,8 @@
 import { pathExists } from "../github/client";
+import { RULE_PATHS } from "../utils/constants";
 import { logger } from "../utils/logger";
-
-/**
- * Enum representing different rule types
- */
-export enum RuleType {
-  CURSOR_RULES = "cursor_rules",
-  CURSOR_RULES_FILE = "cursorrules",
-  WINDSURF_RULES_FILE = "windsurfrules",
-}
-
-/**
- * Rule type information with paths and details
- */
-export interface RuleTypeInfo {
-  type: RuleType;
-  path: string;
-  isDirectory: boolean;
-}
-
-/**
- * Constants for rule paths
- */
-const RULE_PATHS = {
-  [RuleType.CURSOR_RULES]: ".cursor/rules",
-  [RuleType.CURSOR_RULES_FILE]: ".cursorrules",
-  [RuleType.WINDSURF_RULES_FILE]: ".windsurfrules",
-};
+import { RuleType } from "../utils/types";
+import type { RuleTypeInfo } from "../utils/types";
 
 /**
  * Order of precedence for rule types
@@ -52,41 +28,18 @@ export async function detectRuleTypes(
     `Detecting rule types in ${owner}/${repo}${basePath ? `/${basePath}` : ""}`
   );
 
-  // Check for cursor rules directory
-  const cursorRulesPath = `${prefix}${RULE_PATHS[RuleType.CURSOR_RULES]}`;
-  if (await pathExists(owner, repo, cursorRulesPath)) {
-    logger.verbose(`Found ${RuleType.CURSOR_RULES} at ${cursorRulesPath}`);
-    ruleTypes.push({
-      type: RuleType.CURSOR_RULES,
-      path: cursorRulesPath,
-      isDirectory: true,
-    });
-  }
-
-  // Check for cursor rules file
-  const cursorRulesFilePath = `${prefix}${
-    RULE_PATHS[RuleType.CURSOR_RULES_FILE]
-  }`;
-  if (await pathExists(owner, repo, cursorRulesFilePath)) {
-    logger.verbose(
-      `Found ${RuleType.CURSOR_RULES_FILE} at ${cursorRulesFilePath}`
-    );
-    ruleTypes.push({
-      type: RuleType.CURSOR_RULES_FILE,
-      path: cursorRulesFilePath,
-      isDirectory: false,
-    });
-  }
-
-  // Check for windsurf rules file
-  const windsurfRulesPath = `${prefix}${RULE_PATHS[RuleType.WINDSURF_RULES_FILE]}`;
-  if (await pathExists(owner, repo, windsurfRulesPath)) {
-    logger.verbose(`Found ${RuleType.WINDSURF_RULES_FILE} at ${windsurfRulesPath}`);
-    ruleTypes.push({
-      type: RuleType.WINDSURF_RULES_FILE,
-      path: windsurfRulesPath,
-      isDirectory: false,
-    });
+  // Check for each rule type
+  for (const ruleType of Object.values(RuleType)) {
+    const typedRuleType = ruleType as RuleType;
+    const rulePath = `${prefix}${RULE_PATHS[typedRuleType]}`;
+    if (await pathExists(owner, repo, rulePath)) {
+      logger.verbose(`Found ${typedRuleType} at ${rulePath}`);
+      ruleTypes.push({
+        type: typedRuleType,
+        path: rulePath,
+        isDirectory: typedRuleType === RuleType.CURSOR_RULES,
+      });
+    }
   }
 
   return ruleTypes;
