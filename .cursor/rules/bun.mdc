@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+These rules apply for when using Bun for package management:
+
+- Use the [concurrently](mdc:https:/www.npmjs.com/package/concurrently) package for run scripts in parallel
+- Use bunx where possible instead of npx
+- Use `bun run` instead of `npm run`
+- For monorepos, where each package has its own build or dev script command, ensure there is a root package.json script command that can run these commands for all packages together. Use concurrently for long-running dev commands that don't exit and simple concatenation for commands that do exit, like builds.

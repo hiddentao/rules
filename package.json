@@ -1,0 +1,38 @@
+{
+  "name": "rules",
+  "version": "0.1.0",
+  "description": "CLI tool for managing Cursor rules",
+  "module": "index.ts",
+  "type": "module",
+  "bin": {
+    "rules": "./bin/rules.js"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "start": "bun run ./src/index.ts",
+    "dev": "bun --watch ./src/index.ts",
+    "test": "bun test",
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.4.1",
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@types/bun": "latest",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.5",
+    "husky": "^8.0.3",
+    "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "picocolors": "^1.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT"
+}

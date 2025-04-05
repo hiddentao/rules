@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Instructions for using Biome as the linter and formatter include how it should be configured.
+
+# General
+
+- There should be a single biome.json in the root folder of the project (even if the project is a monorepo) that applies the globaly desired Biome rules to the codebase. If any sub-folders/sub-projects require specific rule changes then a biome.json can be created for those but still inheriting from this root biome.json
+- The root package.json or equivalent file containg script commands should have both `lint` and `format` commands configured to run linting and formatting across the entire codebase.
+
+# Typescript
+
+- Allow the use of `any` keyword but as much as possible import/specify exact types. Create a types.d.ts, custom.d.ts, etc if necessary for global types.
+- Omit semicolons where possible
+- Prefer `for of` instead of `forEach`
+

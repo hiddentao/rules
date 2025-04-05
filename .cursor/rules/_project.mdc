@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- include rules from [typescript.mdc](mdc:.cursor/rules/typescript.mdc), [biome.json](mdc:biome.json), [commander.mdc](mdc:.cursor/rules/commander.mdc), [bun.mdc](mdc:.cursor/rules/bun.mdc)
+- follow all the project rules and guidelines outlined in `devdocs/*.md`, with [project.md](mdc:devdocs/project.md) as the starting point.
+- when I ask you to `update docs` you should incorporate a summary of all the changes you've just made to the codebase into the `.md` files in `devdocs/` so that those files are representing the actual current state of the codebase. Ensure you incorporate the summary into the appropriate files in a way that keeps things that are related together and the file structures organized as they currently are.

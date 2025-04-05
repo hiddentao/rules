@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Rules for when building Javascript and/or Typescript projects:
+
+- Use Typescript throughout the codebase, including for scripts executable from the command-line
+- All constant strings, numbers etc should be constants and/or enums as appropriate and, if necessary, specified in a single place and shared throughout the codebaser from that place.
+- All data structures should be strongly typed and, if necessary, specified in a single place and shared throughout the codebase from that place.
+- Use Bun as the package manager, for installing global NPM modules, and for executing scripts
+- Ensure Husky + conventional commits are setup with a package.json script to run the pre-commit step
+- If the project is intending to publish an NPM library that is to be used by others then both ESM and CommonJS output targets are needed - setup tsconfig.json files and package.json script commands accordingly
+

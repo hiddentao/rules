@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+When using the commander.js NPM library
+
+- global help options should be shown for all commands when the `--help` option is passed for those commands. Structure the code to ensure this.
