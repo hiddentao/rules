@@ -1,9 +1,12 @@
 name: Release Please
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      releaseAs:
+        description: 'Release as (optional)'
+        required: false
+        type: string
 
 permissions:
   issues: write
@@ -24,6 +27,7 @@ jobs:
           release-type: node
           package-name: rules
           token: ${{ secrets.GITHUB_TOKEN }}
+          release-as: ${{ github.event.inputs.releaseAs }}
           
   publish:
     runs-on: ubuntu-latest
