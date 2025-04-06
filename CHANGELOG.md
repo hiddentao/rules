@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/hiddentao/rules/compare/v1.0.0...v1.0.1) (2025-04-06)
+
+
+### Bug Fixes
+
+* try to fix release process ([b07ce20](https://github.com/hiddentao/rules/commit/b07ce2074b3c9dad21423f788f26ed0b043a435c))
+
 ## 1.0.0 (2025-04-06)
 
 
