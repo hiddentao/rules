@@ -81,6 +81,11 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
 - **Publishing:**  
   - Uses a GitHub Actions workflow with release-please to manage releases and upload assets (NPM package, native binaries, and `dist/rules.js`).
   - Leverages conventional commits for semantic versioning.
+  - All conventional commit types (feat, fix, chore, docs, perf, refactor, style, test) are configured to trigger releases:
+    - feat commits trigger minor releases
+    - All other commit types trigger patch releases
+  - Binary artifacts (rules-win.exe, rules-macos, rules-linux) from the ./dist-bin/ directory are automatically attached as downloadable assets to each GitHub release.
+  - Release creation and publishing only occur when changes are merged to the main branch, and the release-please PR is accepted.
 - **Testing:**
   - Bun's test framework for end-to-end testing with 20-second timeouts.
   - The execa package for cross-platform binary execution in tests.
@@ -208,9 +213,15 @@ The "rules" CLI tool is designed to fetch and install AI IDE rules for Cursor/Wi
 - **Native Binary Generation:**
   - Use Bun's native executable build process to generate binaries for multiple platforms.
 - **Publishing Workflow:**
-  - Create a GitHub Actions workflow to automate publishing.
-  - Use release-please for release management and upload assets (NPM package, native binaries, and `dist/rules.js`).
-  - Leverage conventional commits to determine version bumps automatically.
+  - Use GitHub Actions workflow to automate publishing.
+  - Use release-please for release management with the following configuration:
+    - All conventional commit types can trigger releases (feat, fix, chore, docs, perf, refactor, style, test)
+    - Feature commits trigger minor version increments
+    - All other commit types trigger patch version increments
+  - Automatically upload all assets (NPM package and native binaries from ./dist-bin/) to GitHub Releases.
+  - Two-phase release process:
+    1. release-please creates a PR with the version bump and changelog updates
+    2. Once the PR is merged, the release is created and binaries are published
 - **Testing Workflow:**
   - Create a GitHub Actions workflow to run end-to-end tests on push and pull requests.
   - Focus on testing complete functionality rather than individual components.
