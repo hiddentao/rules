@@ -35,13 +35,13 @@ You can install the native binaries (Windows, OS X, Linus) for the latest releas
 
 ```shell
 # Windows
-curl -fsSL https://github.com/hiddentao/rules/releases/latest/download/rules-win.exe -o rules.exe
+curl -f https://github.com/hiddentao/rules/releases/latest/download/rules-win.exe -o rules.exe
 
 # Mac/OS X
-curl -fsSL https://github.com/hiddentao/rules/releases/latest/download/rules-macos -o rules
+curl -f https://github.com/hiddentao/rules/releases/latest/download/rules-macos -o rules
 
 # Linux
-curl -fsSL https://github.com/hiddentao/rules/releases/latest/download/rules-linux -o rules
+curl -f https://github.com/hiddentao/rules/releases/latest/download/rules-linux -o rules
 ```
 
 Remember to add the native binary to your `PATH` to be able to call it from anywhere.
