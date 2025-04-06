@@ -2,19 +2,31 @@
   "name": "rules",
   "version": "0.1.0",
   "description": "CLI tool for managing Cursor rules",
-  "module": "index.ts",
+  "module": "./src/index.ts",
   "type": "module",
   "bin": {
-    "rules": "./bin/rules.js"
+    "rules": "./bin/rules"
   },
+  "files": [
+    "bin/*",
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build:dist": "bun build ./src/index.ts --outdir ./dist --target node",
     "start": "bun run ./src/index.ts",
     "dev": "bun build --watch ./src/index.ts --outdir ./dist --target node",
     "test": "bun test",
     "lint": "biome lint .",
     "format": "biome format . --write",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build:linux": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-linux",
+    "build:macos": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-macos",
+    "build:win": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-win.exe",
+    "build:native": "bun run build:linux && bun run build:macos && bun run build:win",
+    "build": "bun run build:dist && bun run build:native",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "@biomejs/biome": "1.4.1",
@@ -43,5 +55,20 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hiddentao/rules"
+  },
+  "keywords": [
+    "cursor",
+    "rules",
+    "cli",
+    "windsurfai",
+    "anthropic"
+  ],
+  "author": "Ramesh Nair <ram@hiddentao.com>",
   "license": "MIT"
 }

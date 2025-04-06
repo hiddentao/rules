@@ -33,4 +33,15 @@ if (import.meta.main) {
   }
 }
 
+// Export commands for programmatic usage
+export { installCommand, program };
+
+// Export GitHub client and other utilities for potential programmatic usage
+export * from "./github/client";
+export * from "./rules/detector";
+export * from "./rules/converter";
+export * from "./rules/fileManager";
+export * from "./rules/selector";
+export * from "./utils/logger";
+
 export default program;

@@ -100,14 +100,9 @@
 
 ### Milestones
 - Successful build producing dist/rules.js
-- Working bin/rules executable script
+- Working bin/rules.js executable script
 - Native binaries generated for multiple platforms
 - Automated release process functional with semantic versioning based on commit types
-
-### Testing Focus
-- End-to-end tests with built package
-- Verify binary execution on different platforms
-- End-to-end tests for complete install flow from GitHub to local system
 
 ## Phase 5: Documentation and Final Testing
 

@@ -17,6 +17,7 @@ jspm_packages/
 
 # Build output
 dist/
+dist-bin/
 
 # Local env files
 .env
