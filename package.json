@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "CLI tool for managing Cursor rules",
   "module": "./src/index.ts",
   "type": "module",
