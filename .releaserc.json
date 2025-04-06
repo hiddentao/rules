@@ -24,7 +24,9 @@
       "@semantic-release/github",
       {
         "assets": [
-          {"path": "dist-bin/**/*", "label": "Binary distribution"}
+          {"path": "dist-bin/rules-macos", "label": "rules-macos"},
+          {"path": "dist-bin/rules-linux", "label": "rules-linux"},
+          {"path": "dist-bin/rules-win.exe", "label": "rules-win.exe"}
         ]
       }
     ],
