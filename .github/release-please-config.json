@@ -9,6 +9,7 @@
       "changelog-sections": [
         {"type": "feat", "section": "Features", "hidden": false, "releaseAs": "minor"},
         {"type": "fix", "section": "Bug Fixes", "hidden": false, "releaseAs": "patch"},
+        {"type": "build", "section": "Build", "hidden": false, "releaseAs": "minor"},
         {"type": "chore", "section": "Miscellaneous", "hidden": false, "releaseAs": "patch"},
         {"type": "docs", "section": "Documentation", "hidden": false, "releaseAs": "patch"},
         {"type": "perf", "section": "Performance Improvements", "hidden": false, "releaseAs": "patch"},
