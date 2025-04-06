@@ -19,16 +19,16 @@ Use your favourite Node.js package manager to install it:
 
 ```shell
 # Install with Bun - RECOMMENDED!
-bun add --global rules
+bun add --global @hiddentao/rules
 
 # Install with NPM
-npm install --global rules
+npm install --global @hiddentao/rules
 
 # Install with PNPM
-pnpm install --global rules
+pnpm install --global @hiddentao/rules
 
 # Install with Yarn
-yarn add --global rules
+yarn add --global @hiddentao/rules
 ```
 
 You can install the native binaries (Windows, OS X, Linus) for the latest release:

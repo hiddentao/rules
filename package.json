@@ -1,5 +1,8 @@
 {
-  "name": "rules",
+  "name": "@hiddentao/rules",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.0.0",
   "description": "CLI tool for managing Cursor rules",
   "module": "./src/index.ts",
@@ -20,7 +23,7 @@
     "test": "bun test",
     "lint": "biome lint .",
     "format": "biome format . --write",
-    "prepare": "husky install",
+    "postinstall": "bun husky install",
     "build:linux": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-linux",
     "build:macos": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-macos",
     "build:win": "bun build ./dist/index.js --compile --outfile ./dist-bin/rules-win.exe",
