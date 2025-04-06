@@ -2,6 +2,9 @@ name: Release Please
 
 on:
   workflow_dispatch: # Allow manual triggering
+  push:
+    branches:
+      - main
 
 permissions:
   issues: write
@@ -14,11 +17,9 @@ jobs:
     steps:
       - name: Release Please
         id: release
-        uses: google-github-actions/release-please-action@v3
+        uses: googleapis/release-please-action@v4
         with:
-          release-type: node # Explicitly state release-type
+          # release-type: node # Let manifest config take precedence
           config-file: .github/release-please-config.json
           manifest-file: .github/release-please-manifest.json # Use a manifest for future flexibility if needed
           token: ${{ secrets.GITHUB_TOKEN }}
-
-# The publish job below this line should be removed as it's handled by publish.yml 
