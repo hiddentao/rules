@@ -1,3 +1,6 @@
+# rules
+
+```ascii
                       ████                  
                      ░░███                  
  ████████  █████ ████ ░███   ██████   █████ 
@@ -6,7 +9,7 @@
  ░███      ░███ ░███  ░███ ░███░░░   ░░░░███
  █████     ░░████████ █████░░██████  ██████ 
 ░░░░░       ░░░░░░░░ ░░░░░  ░░░░░░  ░░░░░░  
-
+```
 
 [![CI](https://github.com/hiddentao/rules/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hiddentao/rules/actions/workflows/ci.yml)
 
